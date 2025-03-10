@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -50,6 +49,13 @@
       background: #e9ecef;
       padding: 5px 10px;
       border-radius: 5px;
+      cursor: grab;
+    }
+    .custom-reward:active {
+      cursor: grabbing;
+    }
+    .custom-reward.dragging {
+      opacity: 0.5;
     }
     .custom-reward button {
       margin-left: 10px;
@@ -73,6 +79,9 @@
     .add-more-container input {
       margin-right: 10px;
       padding: 5px;
+    }
+    #customRewardsContainer {
+      min-height: 50px;
     }
   </style>
 </head>
@@ -134,7 +143,7 @@
       <button onclick="updateValue('dailyPack', 1)">+</button>
     </div>
 
-    <div id="customRewardsContainer"></div>
+    <div id="customRewardsContainer" ondragover="handleDragOver(event)"></div>
 
     <div class="add-more-container">
       <label><input type="checkbox" id="addMoreToggle" onchange="toggleAddMore()"> Add More Rewards</label>
@@ -160,6 +169,7 @@
     };
 
     let customRewards = [];
+    let dragSrcEl;
 
     function updateValue(id, change) {
       const input = document.getElementById(id);
@@ -202,15 +212,17 @@
       }
 
       const rewardId = `customReward_${Date.now()}`;
-      customRewards.push({ id: rewardId, name, shards, checked: true });
+      const newReward = {
+        id: rewardId,
+        name,
+        shards,
+        checked: true
+      };
+
+      customRewards.push(newReward);
 
       const container = document.getElementById('customRewardsContainer');
-      const rewardDiv = document.createElement('div');
-      rewardDiv.className = 'custom-reward';
-      rewardDiv.innerHTML = `
-        <label><input type="checkbox" id="${rewardId}" checked onchange="toggleCustomReward('${rewardId}')"> ${name} (${shards} Shards)</label>
-        <button onclick="removeCustomReward('${rewardId}')">Remove</button>
-      `;
+      const rewardDiv = createRewardElement(newReward);
       container.appendChild(rewardDiv);
 
       document.getElementById('rewardName').value = '';
@@ -218,6 +230,21 @@
 
       saveData();
       calculateTotal();
+    }
+
+    function createRewardElement(reward) {
+      const rewardDiv = document.createElement('div');
+      rewardDiv.className = 'custom-reward';
+      rewardDiv.draggable = true;
+      rewardDiv.id = reward.id;
+      rewardDiv.innerHTML = `
+        <label><input type="checkbox" checked onchange="toggleCustomReward('${reward.id}')"> ${reward.name} (${reward.shards} Shards)</label>
+        <button onclick="removeCustomReward('${reward.id}')">Remove</button>
+      `;
+
+      rewardDiv.addEventListener('dragstart', handleDragStart);
+      rewardDiv.addEventListener('dragend', handleDragEnd);
+      return rewardDiv;
     }
 
     function toggleCustomReward(id) {
@@ -231,11 +258,9 @@
 
     function removeCustomReward(id) {
       customRewards = customRewards.filter(r => r.id !== id);
-
       const container = document.getElementById('customRewardsContainer');
-      const rewardDiv = document.querySelector(`#${id}`).parentElement.parentElement;
+      const rewardDiv = document.getElementById(id);
       container.removeChild(rewardDiv);
-
       saveData();
       calculateTotal();
     }
@@ -244,6 +269,46 @@
       const toggle = document.getElementById('addMoreToggle');
       const section = document.getElementById('addMoreSection');
       section.style.display = toggle.checked ? 'block' : 'none';
+    }
+
+    function handleDragStart(e) {
+      dragSrcEl = this;
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/html', this.outerHTML);
+      setTimeout(() => {
+        this.classList.add('dragging');
+      }, 0);
+    }
+
+    function handleDragEnd(e) {
+      this.classList.remove('dragging');
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      
+      const target = e.target.closest('.custom-reward');
+      const container = document.getElementById('customRewardsContainer');
+      if (target && target !== dragSrcEl) {
+        const rect = target.getBoundingClientRect();
+        const offset = e.clientY - rect.top;
+        
+        if (offset < rect.height / 2) {
+          container.insertBefore(dragSrcEl, target);
+        } else {
+          container.insertBefore(dragSrcEl, target.nextSibling);
+        }
+        
+        updateCustomRewardsOrder();
+      }
+    }
+
+    function updateCustomRewardsOrder() {
+      const container = document.getElementById('customRewardsContainer');
+      const orderedIds = Array.from(container.children).map(el => el.id);
+      customRewards.sort((a, b) => orderedIds.indexOf(a.id) - orderedIds.indexOf(b.id));
+      saveData();
     }
 
     function saveData() {
@@ -278,15 +343,9 @@
         document.getElementById('dailyPack').value = data.dailyPack || 0;
 
         customRewards = data.customRewards || [];
+        const container = document.getElementById('customRewardsContainer');
         customRewards.forEach(reward => {
-          const rewardId = reward.id;
-          const container = document.getElementById('customRewardsContainer');
-          const rewardDiv = document.createElement('div');
-          rewardDiv.className = 'custom-reward';
-          rewardDiv.innerHTML = `
-            <label><input type="checkbox" id="${rewardId}" ${reward.checked ? 'checked' : ''} onchange="toggleCustomReward('${rewardId}')"> ${reward.name} (${reward.shards} Shards)</label>
-            <button onclick="removeCustomReward('${rewardId}')">Remove</button>
-          `;
+          const rewardDiv = createRewardElement(reward);
           container.appendChild(rewardDiv);
         });
       }
@@ -297,4 +356,3 @@
   </script>
 </body>
 </html>
-```
