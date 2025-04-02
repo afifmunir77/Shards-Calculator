@@ -324,12 +324,12 @@
         dailyPack: document.getElementById('dailyPack').value,
         customRewards: customRewards,
       };
-      localStorage.setItem('neonShardsData', JSON.stringify(data));
+      localStorage.setItem('ShardsData', JSON.stringify(data));
       calculateTotal();
     }
 
     function loadData() {
-      const savedData = localStorage.getItem('neonShardsData');
+      const savedData = localStorage.getItem('ShardsData');
       if (savedData) {
         const data = JSON.parse(savedData);
         document.getElementById('ovr99').value = data.ovr99 || 0;
