@@ -83,12 +83,16 @@
     #customRewardsContainer {
       min-height: 50px;
     }
+    .toggle-label {
+      margin-left: 10px;
+      display: flex;
+      align-items: center;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Pitch Beats Shards Calculator</h1>
-
     <div class="input-group">
       <label>99 OVR:</label>
       <button onclick="updateValue('ovr99', -1)">-</button>
@@ -135,16 +139,14 @@
       <label>Others:</label>
       <input type="number" id="others" value="0" min="0" oninput="saveData()">
     </div>
-
     <div class="input-group">
       <label>Daily Pack:</label>
       <button onclick="updateValue('dailyPack', -1)">-</button>
       <input type="number" id="dailyPack" value="0" min="0" readonly>
       <button onclick="updateValue('dailyPack', 1)">+</button>
+      <label class="toggle-label"><input type="checkbox" id="dailyPackToggle" checked onchange="calculateTotal()"> Include</label>
     </div>
-
     <div id="customRewardsContainer" ondragover="handleDragOver(event)"></div>
-
     <div class="add-more-container">
       <label><input type="checkbox" id="addMoreToggle" onchange="toggleAddMore()"> Add More Rewards</label>
       <div id="addMoreSection" style="display: none;">
@@ -153,10 +155,8 @@
         <button onclick="addCustomReward()">Add</button>
       </div>
     </div>
-
     <div class="total" id="totalShards">Total Shards: 0</div>
   </div>
-
   <script>
     const shardValues = {
       ovr99: 5,
@@ -167,7 +167,6 @@
       ovr106: 180,
       ovr107: 250,
     };
-
     let customRewards = [];
     let dragSrcEl;
 
@@ -182,35 +181,33 @@
 
     function calculateTotal() {
       let total = 0;
-
       for (const [key, value] of Object.entries(shardValues)) {
         const count = parseInt(document.getElementById(key).value);
         total += count * value;
       }
-
       total += parseInt(document.getElementById('others').value);
-
+      
       const dailyPackCount = parseInt(document.getElementById('dailyPack').value);
-      total += dailyPackCount * 10;
+      const includeDaily = document.getElementById('dailyPackToggle').checked;
+      if (includeDaily) {
+        total += dailyPackCount * 10;
+      }
 
       customRewards.forEach(reward => {
         if (reward.checked) {
           total += reward.shards;
         }
       });
-
       document.getElementById('totalShards').textContent = `Total Shards: ${total}`;
     }
 
     function addCustomReward() {
       const name = document.getElementById('rewardName').value.trim();
       const shards = parseInt(document.getElementById('rewardShards').value);
-
       if (!name || isNaN(shards) || shards <= 0) {
         alert("Please enter a valid name and shard value.");
         return;
       }
-
       const rewardId = `customReward_${Date.now()}`;
       const newReward = {
         id: rewardId,
@@ -218,16 +215,12 @@
         shards,
         checked: true
       };
-
       customRewards.push(newReward);
-
       const container = document.getElementById('customRewardsContainer');
       const rewardDiv = createRewardElement(newReward);
       container.appendChild(rewardDiv);
-
       document.getElementById('rewardName').value = '';
       document.getElementById('rewardShards').value = '';
-
       saveData();
       calculateTotal();
     }
@@ -241,7 +234,6 @@
         <label><input type="checkbox" checked onchange="toggleCustomReward('${reward.id}')"> ${reward.name} (${reward.shards} Shards)</label>
         <button onclick="removeCustomReward('${reward.id}')">Remove</button>
       `;
-
       rewardDiv.addEventListener('dragstart', handleDragStart);
       rewardDiv.addEventListener('dragend', handleDragEnd);
       return rewardDiv;
@@ -287,19 +279,16 @@
     function handleDragOver(e) {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'move';
-      
       const target = e.target.closest('.custom-reward');
       const container = document.getElementById('customRewardsContainer');
       if (target && target !== dragSrcEl) {
         const rect = target.getBoundingClientRect();
         const offset = e.clientY - rect.top;
-        
         if (offset < rect.height / 2) {
           container.insertBefore(dragSrcEl, target);
         } else {
           container.insertBefore(dragSrcEl, target.nextSibling);
         }
-        
         updateCustomRewardsOrder();
       }
     }
@@ -322,6 +311,7 @@
         ovr107: document.getElementById('ovr107').value,
         others: document.getElementById('others').value,
         dailyPack: document.getElementById('dailyPack').value,
+        dailyPackToggle: document.getElementById('dailyPackToggle').checked,
         customRewards: customRewards,
       };
       localStorage.setItem('ShardsData', JSON.stringify(data));
@@ -341,7 +331,7 @@
         document.getElementById('ovr107').value = data.ovr107 || 0;
         document.getElementById('others').value = data.others || 0;
         document.getElementById('dailyPack').value = data.dailyPack || 0;
-
+        document.getElementById('dailyPackToggle').checked = data.dailyPackToggle !== false;
         customRewards = data.customRewards || [];
         const container = document.getElementById('customRewardsContainer');
         customRewards.forEach(reward => {
