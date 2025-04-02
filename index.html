@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Code: Neon Shards Calculator</title>
+  <title>Pitch Beats Shards Calculator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -87,13 +87,13 @@
 </head>
 <body>
   <div class="container">
-    <h1>Code: Neon Shards Calculator</h1>
+    <h1>Pitch Beats Shards Calculator</h1>
 
     <div class="input-group">
-      <label>98-99 OVR:</label>
-      <button onclick="updateValue('ovr98_99', -1)">-</button>
-      <input type="number" id="ovr98_99" value="0" min="0" readonly>
-      <button onclick="updateValue('ovr98_99', 1)">+</button>
+      <label>99 OVR:</label>
+      <button onclick="updateValue('ovr99', -1)">-</button>
+      <input type="number" id="ovr99" value="0" min="0" readonly>
+      <button onclick="updateValue('ovr99', 1)">+</button>
     </div>
     <div class="input-group">
       <label>100-102 OVR:</label>
@@ -159,7 +159,7 @@
 
   <script>
     const shardValues = {
-      ovr98_99: 5,
+      ovr99: 5,
       ovr100_102: 10,
       ovr103: 30,
       ovr104: 60,
@@ -313,7 +313,7 @@
 
     function saveData() {
       const data = {
-        ovr98_99: document.getElementById('ovr98_99').value,
+        ovr99: document.getElementById('ovr99').value,
         ovr100_102: document.getElementById('ovr100_102').value,
         ovr103: document.getElementById('ovr103').value,
         ovr104: document.getElementById('ovr104').value,
@@ -332,7 +332,7 @@
       const savedData = localStorage.getItem('neonShardsData');
       if (savedData) {
         const data = JSON.parse(savedData);
-        document.getElementById('ovr98_99').value = data.ovr98_99 || 0;
+        document.getElementById('ovr99').value = data.ovr99 || 0;
         document.getElementById('ovr100_102').value = data.ovr100_102 || 0;
         document.getElementById('ovr103').value = data.ovr103 || 0;
         document.getElementById('ovr104').value = data.ovr104 || 0;
