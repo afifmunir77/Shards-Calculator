@@ -247,7 +247,7 @@
       const monopolyToggle = document.getElementById('monopolyToggle').checked;
       if (monopolyToggle) {
         const monopolyCount = parseInt(document.getElementById('monopoly').value);
-        const rawShards = monopolyCount * 2.8 * 5;
+        const rawShards = monopolyCount * 1 * 5;
         const roundedShards = Math.round(rawShards / 5) * 5;
         total += roundedShards;
       }
