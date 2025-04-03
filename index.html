@@ -140,11 +140,22 @@
       <input type="number" id="others" value="0" min="0" oninput="saveData()">
     </div>
     <div class="input-group">
-      <label>Daily Pack:</label>
+      <label>Daily Pack (lowest estimate):</label>
       <button onclick="updateValue('dailyPack', -1)">-</button>
       <input type="number" id="dailyPack" value="0" min="0" readonly>
       <button onclick="updateValue('dailyPack', 1)">+</button>
-      <label class="toggle-label"><input type="checkbox" id="dailyPackToggle" checked onchange="calculateTotal()"> Include</label>
+      <label class="toggle-label">
+        <input type="checkbox" id="dailyPackToggle" checked onchange="handleDailyToggle('lowest')"> Include
+      </label>
+    </div>
+    <div class="input-group">
+      <label>Daily Pack (Probability-based estimate):</label>
+      <button onclick="updateValue('dailyPackProb', -1)">-</button>
+      <input type="number" id="dailyPackProb" value="0" min="0" readonly>
+      <button onclick="updateValue('dailyPackProb', 1)">+</button>
+      <label class="toggle-label">
+        <input type="checkbox" id="dailyPackProbToggle" onchange="handleDailyToggle('prob')"> Include
+      </label>
     </div>
     <div id="customRewardsContainer" ondragover="handleDragOver(event)"></div>
     <div class="add-more-container">
@@ -179,6 +190,18 @@
       calculateTotal();
     }
 
+    function handleDailyToggle(source) {
+      const lowestToggle = document.getElementById('dailyPackToggle');
+      const probToggle = document.getElementById('dailyPackProbToggle');
+      
+      if (source === 'lowest') {
+        if (lowestToggle.checked) probToggle.checked = false;
+      } else {
+        if (probToggle.checked) lowestToggle.checked = false;
+      }
+      calculateTotal();
+    }
+
     function calculateTotal() {
       let total = 0;
       for (const [key, value] of Object.entries(shardValues)) {
@@ -187,10 +210,28 @@
       }
       total += parseInt(document.getElementById('others').value);
       
-      const dailyPackCount = parseInt(document.getElementById('dailyPack').value);
-      const includeDaily = document.getElementById('dailyPackToggle').checked;
-      if (includeDaily) {
+      // Handle lowest estimate daily pack
+      const includeLowest = document.getElementById('dailyPackToggle').checked;
+      if (includeLowest) {
+        const dailyPackCount = parseInt(document.getElementById('dailyPack').value);
         total += dailyPackCount * 10;
+      }
+
+      // Handle probability-based daily pack
+      const includeProb = document.getElementById('dailyPackProbToggle').checked;
+      if (includeProb) {
+        const dailyPackProb = parseInt(document.getElementById('dailyPackProb').value);
+        if (dailyPackProb > 0) {
+          const probShards = dailyPackProb * (
+            0.5079 * 10 +
+            0.254 * 30 +
+            0.127 * 60 +
+            0.0635 * 120 +
+            0.0317 * 180 +
+            0.0159 * 250
+          );
+          total += Math.ceil(probShards / 5) * 5;
+        }
       }
 
       customRewards.forEach(reward => {
@@ -311,7 +352,9 @@
         ovr107: document.getElementById('ovr107').value,
         others: document.getElementById('others').value,
         dailyPack: document.getElementById('dailyPack').value,
+        dailyPackProb: document.getElementById('dailyPackProb').value,
         dailyPackToggle: document.getElementById('dailyPackToggle').checked,
+        dailyPackProbToggle: document.getElementById('dailyPackProbToggle').checked,
         customRewards: customRewards,
       };
       localStorage.setItem('ShardsData', JSON.stringify(data));
@@ -331,7 +374,14 @@
         document.getElementById('ovr107').value = data.ovr107 || 0;
         document.getElementById('others').value = data.others || 0;
         document.getElementById('dailyPack').value = data.dailyPack || 0;
+        document.getElementById('dailyPackProb').value = data.dailyPackProb || 0;
         document.getElementById('dailyPackToggle').checked = data.dailyPackToggle !== false;
+        document.getElementById('dailyPackProbToggle').checked = data.dailyPackProbToggle || false;
+        
+        // Ensure mutual exclusivity on load
+        if (data.dailyPackToggle && data.dailyPackProbToggle) {
+          data.dailyPackProbToggle = false;
+        }
         customRewards = data.customRewards || [];
         const container = document.getElementById('customRewardsContainer');
         customRewards.forEach(reward => {
