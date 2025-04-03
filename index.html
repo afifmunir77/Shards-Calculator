@@ -140,21 +140,30 @@
       <input type="number" id="others" value="0" min="0" oninput="saveData()">
     </div>
     <div class="input-group">
-      <label>Daily Pack (lowest estimate):</label>
+      <label>Daily Pack (Lowest Estimate):</label>
       <button onclick="updateValue('dailyPack', -1)">-</button>
       <input type="number" id="dailyPack" value="0" min="0" readonly>
       <button onclick="updateValue('dailyPack', 1)">+</button>
       <label class="toggle-label">
-        <input type="checkbox" id="dailyPackToggle" checked onchange="handleDailyToggle('lowest')"> Include
+        <input type="checkbox" id="dailyPackToggle" checked onchange="handleDailyToggle('lowest')"> 
       </label>
     </div>
     <div class="input-group">
-      <label>Daily Pack (Probability-based estimate):</label>
+      <label>Daily Pack (Probability-based):</label>
       <button onclick="updateValue('dailyPackProb', -1)">-</button>
       <input type="number" id="dailyPackProb" value="0" min="0" readonly>
       <button onclick="updateValue('dailyPackProb', 1)">+</button>
       <label class="toggle-label">
-        <input type="checkbox" id="dailyPackProbToggle" onchange="handleDailyToggle('prob')"> Include
+        <input type="checkbox" id="dailyPackProbToggle" onchange="handleDailyToggle('prob')"> 
+      </label>
+    </div>
+    <div class="input-group">
+      <label>Monopoly:</label>
+      <button onclick="updateValue('monopoly', -1)">-</button>
+      <input type="number" id="monopoly" value="0" min="0" readonly>
+      <button onclick="updateValue('monopoly', 1)">+</button>
+      <label class="toggle-label">
+        <input type="checkbox" id="monopolyToggle" onchange="calculateTotal()"> 
       </label>
     </div>
     <div id="customRewardsContainer" ondragover="handleDragOver(event)"></div>
@@ -232,6 +241,15 @@
           );
           total += Math.ceil(probShards / 5) * 5;
         }
+      }
+
+      // Handle Monopoly
+      const monopolyToggle = document.getElementById('monopolyToggle').checked;
+      if (monopolyToggle) {
+        const monopolyCount = parseInt(document.getElementById('monopoly').value);
+        const rawShards = monopolyCount * 2.8 * 5;
+        const roundedShards = Math.round(rawShards / 5) * 5;
+        total += roundedShards;
       }
 
       customRewards.forEach(reward => {
@@ -353,8 +371,10 @@
         others: document.getElementById('others').value,
         dailyPack: document.getElementById('dailyPack').value,
         dailyPackProb: document.getElementById('dailyPackProb').value,
+        monopoly: document.getElementById('monopoly').value,
         dailyPackToggle: document.getElementById('dailyPackToggle').checked,
         dailyPackProbToggle: document.getElementById('dailyPackProbToggle').checked,
+        monopolyToggle: document.getElementById('monopolyToggle').checked,
         customRewards: customRewards,
       };
       localStorage.setItem('ShardsData', JSON.stringify(data));
@@ -375,8 +395,10 @@
         document.getElementById('others').value = data.others || 0;
         document.getElementById('dailyPack').value = data.dailyPack || 0;
         document.getElementById('dailyPackProb').value = data.dailyPackProb || 0;
+        document.getElementById('monopoly').value = data.monopoly || 0;
         document.getElementById('dailyPackToggle').checked = data.dailyPackToggle !== false;
         document.getElementById('dailyPackProbToggle').checked = data.dailyPackProbToggle || false;
+        document.getElementById('monopolyToggle').checked = data.monopolyToggle || false;
         
         // Ensure mutual exclusivity on load
         if (data.dailyPackToggle && data.dailyPackProbToggle) {
