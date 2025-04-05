@@ -42,6 +42,9 @@
       padding: 5px 10px;
       cursor: pointer;
     }
+    #unlimitedBundle {
+      width: 120px; /* Enlarged input field */
+    }
     .custom-reward {
       display: flex;
       align-items: center;
@@ -166,6 +169,13 @@
         <input type="checkbox" id="monopolyToggle" onchange="calculateTotal()"> 
       </label>
     </div>
+    <div class="input-group">
+      <label>Unlimited Bundle (Gems):</label>
+      <input type="number" id="unlimitedBundle" value="0" min="0" oninput="saveData()">
+      <label class="toggle-label">
+        <input type="checkbox" id="unlimitedBundleToggle" onchange="calculateTotal()"> 
+      </label>
+    </div>
     <div id="customRewardsContainer" ondragover="handleDragOver(event)"></div>
     <div class="add-more-container">
       <label><input type="checkbox" id="addMoreToggle" onchange="toggleAddMore()"> Add More Rewards</label>
@@ -247,9 +257,28 @@
       const monopolyToggle = document.getElementById('monopolyToggle').checked;
       if (monopolyToggle) {
         const monopolyCount = parseInt(document.getElementById('monopoly').value);
-        const rawShards = monopolyCount * 1 * 5;
+        const rawShards = monopolyCount * 2.8 * 5;
         const roundedShards = Math.round(rawShards / 5) * 5;
         total += roundedShards;
+      }
+
+      // Handle Unlimited Bundle
+      const unlimitedToggle = document.getElementById('unlimitedBundleToggle').checked;
+      if (unlimitedToggle) {
+        const gems = parseInt(document.getElementById('unlimitedBundle').value);
+        const n = Math.floor(gems / 2500);
+        if (n > 0) {
+          const shards = (
+            n * (0.502 + 0.251 + 0.1255) * 10 +
+            n * 0.0627 * 30 +
+            n * 0.0314 * 60 +
+            n * 0.0157 * 120 +
+            n * 0.0078 * 180 +
+            n * 0.0039 * 250
+          );
+          const roundedShards = Math.round(shards / 5) * 5;
+          total += roundedShards;
+        }
       }
 
       customRewards.forEach(reward => {
@@ -372,9 +401,11 @@
         dailyPack: document.getElementById('dailyPack').value,
         dailyPackProb: document.getElementById('dailyPackProb').value,
         monopoly: document.getElementById('monopoly').value,
+        unlimitedBundle: document.getElementById('unlimitedBundle').value,
         dailyPackToggle: document.getElementById('dailyPackToggle').checked,
         dailyPackProbToggle: document.getElementById('dailyPackProbToggle').checked,
         monopolyToggle: document.getElementById('monopolyToggle').checked,
+        unlimitedBundleToggle: document.getElementById('unlimitedBundleToggle').checked,
         customRewards: customRewards,
       };
       localStorage.setItem('ShardsData', JSON.stringify(data));
@@ -396,9 +427,11 @@
         document.getElementById('dailyPack').value = data.dailyPack || 0;
         document.getElementById('dailyPackProb').value = data.dailyPackProb || 0;
         document.getElementById('monopoly').value = data.monopoly || 0;
+        document.getElementById('unlimitedBundle').value = data.unlimitedBundle || 0;
         document.getElementById('dailyPackToggle').checked = data.dailyPackToggle !== false;
         document.getElementById('dailyPackProbToggle').checked = data.dailyPackProbToggle || false;
         document.getElementById('monopolyToggle').checked = data.monopolyToggle || false;
+        document.getElementById('unlimitedBundleToggle').checked = data.unlimitedBundleToggle || false;
         
         // Ensure mutual exclusivity on load
         if (data.dailyPackToggle && data.dailyPackProbToggle) {
