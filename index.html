@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pitch Beats Shards Calculator</title>
+  <title>TOTS Shards Calculator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -41,9 +41,6 @@
     .input-group button {
       padding: 5px 10px;
       cursor: pointer;
-    }
-    #unlimitedBundle {
-      width: 120px; /* Enlarged input field */
     }
     .custom-reward {
       display: flex;
@@ -86,39 +83,22 @@
     #customRewardsContainer {
       min-height: 50px;
     }
-    .toggle-label {
-      margin-left: 10px;
-      display: flex;
-      align-items: center;
-    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Pitch Beats Shards Calculator</h1>
+    <h1>TOTS Shards Calculator</h1>
     <div class="input-group">
-      <label>99 OVR:</label>
-      <button onclick="updateValue('ovr99', -1)">-</button>
-      <input type="number" id="ovr99" value="0" min="0" readonly>
-      <button onclick="updateValue('ovr99', 1)">+</button>
+      <label>100-101 OVR:</label>
+      <button onclick="updateValue('ovr100_101', -1)">-</button>
+      <input type="number" id="ovr100_101" value="0" min="0" readonly>
+      <button onclick="updateValue('ovr100_101', 1)">+</button>
     </div>
     <div class="input-group">
-      <label>100-102 OVR:</label>
-      <button onclick="updateValue('ovr100_102', -1)">-</button>
-      <input type="number" id="ovr100_102" value="0" min="0" readonly>
-      <button onclick="updateValue('ovr100_102', 1)">+</button>
-    </div>
-    <div class="input-group">
-      <label>103 OVR:</label>
-      <button onclick="updateValue('ovr103', -1)">-</button>
-      <input type="number" id="ovr103" value="0" min="0" readonly>
-      <button onclick="updateValue('ovr103', 1)">+</button>
-    </div>
-    <div class="input-group">
-      <label>104 OVR:</label>
-      <button onclick="updateValue('ovr104', -1)">-</button>
-      <input type="number" id="ovr104" value="0" min="0" readonly>
-      <button onclick="updateValue('ovr104', 1)">+</button>
+      <label>102-104 OVR:</label>
+      <button onclick="updateValue('ovr102_104', -1)">-</button>
+      <input type="number" id="ovr102_104" value="0" min="0" readonly>
+      <button onclick="updateValue('ovr102_104', 1)">+</button>
     </div>
     <div class="input-group">
       <label>105 OVR:</label>
@@ -139,42 +119,26 @@
       <button onclick="updateValue('ovr107', 1)">+</button>
     </div>
     <div class="input-group">
+      <label>108 OVR:</label>
+      <button onclick="updateValue('ovr108', -1)">-</button>
+      <input type="number" id="ovr108" value="0" min="0" readonly>
+      <button onclick="updateValue('ovr108', 1)">+</button>
+    </div>
+    <div class="input-group">
+      <label>109 OVR:</label>
+      <button onclick="updateValue('ovr109', -1)">-</button>
+      <input type="number" id="ovr109" value="0" min="0" readonly>
+      <button onclick="updateValue('ovr109', 1)">+</button>
+    </div>
+    <div class="input-group">
       <label>Others:</label>
       <input type="number" id="others" value="0" min="0" oninput="saveData()">
     </div>
     <div class="input-group">
-      <label>Daily Pack (Lowest Estimate):</label>
+      <label>Daily Pack:</label>
       <button onclick="updateValue('dailyPack', -1)">-</button>
       <input type="number" id="dailyPack" value="0" min="0" readonly>
       <button onclick="updateValue('dailyPack', 1)">+</button>
-      <label class="toggle-label">
-        <input type="checkbox" id="dailyPackToggle" checked onchange="handleDailyToggle('lowest')"> 
-      </label>
-    </div>
-    <div class="input-group">
-      <label>Daily Pack (Probability-based):</label>
-      <button onclick="updateValue('dailyPackProb', -1)">-</button>
-      <input type="number" id="dailyPackProb" value="0" min="0" readonly>
-      <button onclick="updateValue('dailyPackProb', 1)">+</button>
-      <label class="toggle-label">
-        <input type="checkbox" id="dailyPackProbToggle" onchange="handleDailyToggle('prob')"> 
-      </label>
-    </div>
-    <div class="input-group">
-      <label>Monopoly:</label>
-      <button onclick="updateValue('monopoly', -1)">-</button>
-      <input type="number" id="monopoly" value="0" min="0" readonly>
-      <button onclick="updateValue('monopoly', 1)">+</button>
-      <label class="toggle-label">
-        <input type="checkbox" id="monopolyToggle" onchange="calculateTotal()"> 
-      </label>
-    </div>
-    <div class="input-group">
-      <label>Unlimited Bundle (Gems):</label>
-      <input type="number" id="unlimitedBundle" value="0" min="0" oninput="saveData()">
-      <label class="toggle-label">
-        <input type="checkbox" id="unlimitedBundleToggle" onchange="calculateTotal()"> 
-      </label>
     </div>
     <div id="customRewardsContainer" ondragover="handleDragOver(event)"></div>
     <div class="add-more-container">
@@ -189,13 +153,13 @@
   </div>
   <script>
     const shardValues = {
-      ovr99: 5,
-      ovr100_102: 10,
-      ovr103: 30,
-      ovr104: 60,
-      ovr105: 120,
-      ovr106: 180,
-      ovr107: 250,
+      ovr100_101: 5,
+      ovr102_104: 10,
+      ovr105: 30,
+      ovr106: 60,
+      ovr107: 120,
+      ovr108: 180,
+      ovr109: 250,
     };
     let customRewards = [];
     let dragSrcEl;
@@ -209,18 +173,6 @@
       calculateTotal();
     }
 
-    function handleDailyToggle(source) {
-      const lowestToggle = document.getElementById('dailyPackToggle');
-      const probToggle = document.getElementById('dailyPackProbToggle');
-      
-      if (source === 'lowest') {
-        if (lowestToggle.checked) probToggle.checked = false;
-      } else {
-        if (probToggle.checked) lowestToggle.checked = false;
-      }
-      calculateTotal();
-    }
-
     function calculateTotal() {
       let total = 0;
       for (const [key, value] of Object.entries(shardValues)) {
@@ -228,59 +180,8 @@
         total += count * value;
       }
       total += parseInt(document.getElementById('others').value);
-      
-      // Handle lowest estimate daily pack
-      const includeLowest = document.getElementById('dailyPackToggle').checked;
-      if (includeLowest) {
-        const dailyPackCount = parseInt(document.getElementById('dailyPack').value);
-        total += dailyPackCount * 10;
-      }
-
-      // Handle probability-based daily pack
-      const includeProb = document.getElementById('dailyPackProbToggle').checked;
-      if (includeProb) {
-        const dailyPackProb = parseInt(document.getElementById('dailyPackProb').value);
-        if (dailyPackProb > 0) {
-          const probShards = dailyPackProb * (
-            0.5079 * 10 +
-            0.254 * 30 +
-            0.127 * 60 +
-            0.0635 * 120 +
-            0.0317 * 180 +
-            0.0159 * 250
-          );
-          total += Math.ceil(probShards / 5) * 5;
-        }
-      }
-
-      // Handle Monopoly
-      const monopolyToggle = document.getElementById('monopolyToggle').checked;
-      if (monopolyToggle) {
-        const monopolyCount = parseInt(document.getElementById('monopoly').value);
-        const rawShards = monopolyCount * 1 * 5;
-        const roundedShards = Math.round(rawShards / 5) * 5;
-        total += roundedShards;
-      }
-
-      // Handle Unlimited Bundle
-      const unlimitedToggle = document.getElementById('unlimitedBundleToggle').checked;
-      if (unlimitedToggle) {
-        const gems = parseInt(document.getElementById('unlimitedBundle').value);
-        const n = Math.floor(gems / 2500);
-        if (n > 0) {
-          const shards = (
-            n * (0.502 + 0.251 + 0.1255) * 10 +
-            n * 0.0627 * 30 +
-            n * 0.0314 * 60 +
-            n * 0.0157 * 120 +
-            n * 0.0078 * 180 +
-            n * 0.0039 * 250
-          );
-          const roundedShards = Math.round(shards / 5) * 5;
-          total += roundedShards;
-        }
-      }
-
+      const dailyPackCount = parseInt(document.getElementById('dailyPack').value);
+      total += dailyPackCount * 10;
       customRewards.forEach(reward => {
         if (reward.checked) {
           total += reward.shards;
@@ -390,22 +291,15 @@
 
     function saveData() {
       const data = {
-        ovr99: document.getElementById('ovr99').value,
-        ovr100_102: document.getElementById('ovr100_102').value,
-        ovr103: document.getElementById('ovr103').value,
-        ovr104: document.getElementById('ovr104').value,
+        ovr100_101: document.getElementById('ovr100_101').value,
+        ovr102_104: document.getElementById('ovr102_104').value,
         ovr105: document.getElementById('ovr105').value,
         ovr106: document.getElementById('ovr106').value,
         ovr107: document.getElementById('ovr107').value,
+        ovr108: document.getElementById('ovr108').value,
+        ovr109: document.getElementById('ovr109').value,
         others: document.getElementById('others').value,
         dailyPack: document.getElementById('dailyPack').value,
-        dailyPackProb: document.getElementById('dailyPackProb').value,
-        monopoly: document.getElementById('monopoly').value,
-        unlimitedBundle: document.getElementById('unlimitedBundle').value,
-        dailyPackToggle: document.getElementById('dailyPackToggle').checked,
-        dailyPackProbToggle: document.getElementById('dailyPackProbToggle').checked,
-        monopolyToggle: document.getElementById('monopolyToggle').checked,
-        unlimitedBundleToggle: document.getElementById('unlimitedBundleToggle').checked,
         customRewards: customRewards,
       };
       localStorage.setItem('ShardsData', JSON.stringify(data));
@@ -416,27 +310,15 @@
       const savedData = localStorage.getItem('ShardsData');
       if (savedData) {
         const data = JSON.parse(savedData);
-        document.getElementById('ovr99').value = data.ovr99 || 0;
-        document.getElementById('ovr100_102').value = data.ovr100_102 || 0;
-        document.getElementById('ovr103').value = data.ovr103 || 0;
-        document.getElementById('ovr104').value = data.ovr104 || 0;
+        document.getElementById('ovr100_101').value = data.ovr100_101 || 0;
+        document.getElementById('ovr102_104').value = data.ovr102_104 || 0;
         document.getElementById('ovr105').value = data.ovr105 || 0;
         document.getElementById('ovr106').value = data.ovr106 || 0;
         document.getElementById('ovr107').value = data.ovr107 || 0;
+        document.getElementById('ovr108').value = data.ovr108 || 0;
+        document.getElementById('ovr109').value = data.ovr109 || 0;
         document.getElementById('others').value = data.others || 0;
         document.getElementById('dailyPack').value = data.dailyPack || 0;
-        document.getElementById('dailyPackProb').value = data.dailyPackProb || 0;
-        document.getElementById('monopoly').value = data.monopoly || 0;
-        document.getElementById('unlimitedBundle').value = data.unlimitedBundle || 0;
-        document.getElementById('dailyPackToggle').checked = data.dailyPackToggle !== false;
-        document.getElementById('dailyPackProbToggle').checked = data.dailyPackProbToggle || false;
-        document.getElementById('monopolyToggle').checked = data.monopolyToggle || false;
-        document.getElementById('unlimitedBundleToggle').checked = data.unlimitedBundleToggle || false;
-        
-        // Ensure mutual exclusivity on load
-        if (data.dailyPackToggle && data.dailyPackProbToggle) {
-          data.dailyPackProbToggle = false;
-        }
         customRewards = data.customRewards || [];
         const container = document.getElementById('customRewardsContainer');
         customRewards.forEach(reward => {
